@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/reshmanavale/FlaskTest.git'
+                git 'git@github.com:reshmanavale/FlaskTest.git'
             }
         }
 
