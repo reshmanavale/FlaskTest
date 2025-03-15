@@ -11,6 +11,8 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
+                git branch: 'main',
+                    credentialsId: 'git',
                 git 'git@github.com:reshmanavale/FlaskTest.git'
             }
         }
