@@ -13,7 +13,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'git',
-                git 'git@github.com:reshmanavale/FlaskTest.git'
+                    url: 'git@github.com:reshmanavale/FlaskTest.git'
             }
         }
 
