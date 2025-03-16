@@ -22,7 +22,7 @@ pipeline {
                 sh '''
                 apt update && apt install -y python3-venv python3-pip
                 python3 -m venv venv
-                .venv/bin/activate
+                . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -32,7 +32,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                .venv/bin/activate
+                . venv/bin/activate
                 pip install pytest  # Ensure pytest is installed
                 pytest || true  # Allow tests to fail without stopping pipeline
                 '''
