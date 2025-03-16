@@ -61,7 +61,7 @@ pipeline {
                     git pull origin main
                 fi
 
-                # Set up virtual environment (required for Ubuntu 24.04)
+                # Set up virtual environment
                 echo "🐍 Setting up virtual environment..."
                 python3 -m venv venv
                 source venv/bin/activate
