@@ -33,6 +33,7 @@ pipeline {
             steps {
                  sh '''
                 . venv/bin/activate
+                pip list | grep pytest  # Debugging step
                 pytest
                 '''
             }
