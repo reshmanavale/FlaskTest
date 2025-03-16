@@ -39,51 +39,46 @@ pipeline {
             }
         }
 
-      stage('Deploy to EC2') {
+        stage('Deploy to EC2') {
           steps {
             script {
-              sh """
+             sh """
                 ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/id_rsa ubuntu@13.57.48.63 <<EOF
-                set -e  # Stop on first error
-                echo "🚀 Connecting to EC2 and deploying Flask app"
+                set -e  # Exit on error
 
-                # Ensure the target directory exists
-                mkdir -p ~/FlaskTest
+                echo "🚀 Connecting to EC2 and deploying Flask app"
                 cd ~/FlaskTest || exit 1
 
-                # Clone the repo if it does not exist, otherwise pull the latest changes
-                if [ ! -d ".git" ]; then
-                    echo "📂 Cloning repository..."
-                    git clone https://github.com/reshmanavale/FlaskTest.git .
-                else
-                    echo "🔄 Pulling latest changes..."
-                    git reset --hard
-                    git pull origin main
-                fi
+                # Kill any existing process running on port 5000
+                echo "🛑 Stopping existing Flask process..."
+                PID=\$(lsof -t -i:5000) && kill -9 \$PID || echo "No process running on port 5000"
 
-                # Set up virtual environment
-                echo "🐍 Setting up virtual environment..."
-                python3 -m venv venv
+                # Pull latest changes
+                git reset --hard
+                git pull origin main
+
+                # Activate virtual environment
                 source venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
 
-                # Stop any running Flask app (if any)
-                echo "🛑 Stopping any running Flask process..."
-                pkill -f "python3 app.py" || true
-
-                # Start Flask application
+                # Start Flask app
                 echo "🚀 Starting Flask app..."
                 nohup venv/bin/python3 app.py > output.log 2>&1 &
 
                 echo "✅ Deployment completed successfully!"
-                exit 0  # Force successful exit
+                exit 0  # Ensure Jenkins marks it as success
                 EOF
-                exit 0  # Ensure Jenkins does not fail
+                exit 0  # Ensure Jenkins success
             """
         }
     }
 }
+
+
+
+
+               
 
 
 }
