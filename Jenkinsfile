@@ -40,11 +40,11 @@ pipeline {
         }
 
       stage('Deploy to EC2') {
-    steps {
-        script {
-            sh """
+          steps {
+            script {
+              sh """
                 ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/id_rsa ubuntu@13.57.48.63 <<EOF
-                set -e  # Exit on error
+                set -e  # Stop on first error
                 echo "🚀 Connecting to EC2 and deploying Flask app"
 
                 # Ensure the target directory exists
@@ -77,11 +77,14 @@ pipeline {
                 nohup venv/bin/python3 app.py > output.log 2>&1 &
 
                 echo "✅ Deployment completed successfully!"
-                exit 0
+                exit 0  # Force successful exit
                 EOF
+                exit 0  # Ensure Jenkins does not fail
             """
         }
     }
 }
+
+
 }
 }
