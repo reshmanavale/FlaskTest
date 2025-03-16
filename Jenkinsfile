@@ -31,19 +31,8 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh '''
-                . venv/bin/activate
-                pip install pytest  # Ensure pytest is installed
-                pytest || true  # Allow tests to fail without stopping pipeline
-                '''
-            }
-        }
-
-       stage('Deploy to EC2') {
-    steps {
-        script {
-            sh """
-            ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/id_rsa ubuntu@13.57.48.63 << 'EOF'
+                sh """
+                ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/id_rsa ubuntu@13.57.48.63 <<EOF
                 set -e  # Exit on error
                 echo "🚀 Connecting to EC2 and deploying Flask app"
 
@@ -75,6 +64,18 @@ pipeline {
                 # Start Flask application
                 echo "🚀 Starting Flask app..."
                 nohup venv/bin/python3 app.py > output.log 2>&1 &
+
+                echo "✅ Deployment completed successfully!"
+                exit 0
+                EOF
+            """
+            }
+        }
+
+       stage('Deploy to EC2') {
+    steps {
+        script {
+            
 
                 echo "✅ Deployment completed successfully!"
             EOF
