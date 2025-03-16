@@ -44,17 +44,30 @@ pipeline {
         script {
             sh """
             ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} <<EOF
+                set -e  # Exit script on error
                 mkdir -p ${APP_DIR}
-                sudo apt update && sudo apt install -y python3-pip
                 cd ${APP_DIR}
+
+                # Clone repo if not exists, else pull latest changes
                 if [ ! -d "FlaskTest" ]; then
                     git clone https://github.com/reshmanavale/FlaskTest.git
-                else
-                    cd FlaskTest && git pull
                 fi
+                
                 cd FlaskTest
-                pip3 install -r requirements.txt
-                nohup python3 app.py > output.log 2>&1 &
+                git pull  # Ensure latest changes
+
+                # Use virtual environment due to Ubuntu 24.04 restrictions
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+
+                # Stop any existing Flask app
+                pkill -f "python3 app.py" || true
+
+                # Start Flask app in the background
+                nohup venv/bin/python3 app.py > output.log 2>&1 &
+
             EOF
             """
         }
