@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 script {
-                    sh """
+                   sh """
                     ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} << 'EOF'
                         # Ensure deployment directory exists
                         mkdir -p ${APP_DIR}
@@ -70,7 +70,7 @@ pipeline {
                         pip install --upgrade pip
                         pip install -r requirements.txt
 
-                        # Kill any running process and restart
+                        # Kill any running process and restart app with gunicorn
                         pkill -f "gunicorn" || true
                         nohup venv/bin/gunicorn --bind 0.0.0.0:5000 wsgi:app > output.log 2>&1 &
 
