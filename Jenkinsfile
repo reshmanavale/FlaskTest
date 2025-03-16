@@ -39,46 +39,46 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
-          steps {
-            script {
-             sh """
+       stage('Deploy to EC2') {
+            steps {
+               script {
+                  sh """
                 ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/id_rsa ubuntu@13.57.48.63 <<EOF
-                set -e  # Exit on error
-
-                echo "🚀 Connecting to EC2 and deploying Flask app"
+                set -e  # Stop script on error
+                
+                echo "🚀 Deploying Flask app..."
                 cd ~/FlaskTest || exit 1
 
-                # Kill any existing process running on port 5000
-                echo "🛑 Stopping existing Flask process..."
-                PID=\$(lsof -t -i:5000) && kill -9 \$PID || echo "No process running on port 5000"
+                # 🔥 STOP any running Flask process before starting a new one
+                echo "🛑 Checking for existing Flask processes..."
+                PID=\$(lsof -t -i:5000) || true  # Prevent failure if no process is running
+                if [ -n "\$PID" ]; then
+                    echo "Killing existing Flask process: \$PID"
+                    kill -9 \$PID || true  # Ignore failure if the process is already dead
+                else
+                    echo "No existing Flask process found."
+                fi
 
-                # Pull latest changes
+                # Fetch latest code
                 git reset --hard
                 git pull origin main
 
-                # Activate virtual environment
+                # Activate virtual environment and install dependencies
                 source venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
 
-                # Start Flask app
-                echo "🚀 Starting Flask app..."
+                # 🚀 Start Flask app in the background
+                echo "Starting Flask app..."
                 nohup venv/bin/python3 app.py > output.log 2>&1 &
 
                 echo "✅ Deployment completed successfully!"
-                exit 0  # Ensure Jenkins marks it as success
+                exit 0  # ✅ Ensure Jenkins exits successfully
                 EOF
-                exit 0  # Ensure Jenkins success
             """
         }
     }
 }
-
-
-
-
-               
 
 
 }
