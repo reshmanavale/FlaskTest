@@ -42,17 +42,7 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 script {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} << 'EOF'
-                        mkdir -p ${APP_DIR}
-                        sudo apt update && sudo apt install -y python3-pip
-                        cd ${APP_DIR}
-                        git clone https://github.com/UnpredictablePrashant/FlaskTest.git || (cd FlaskTest && git pull)
-                        cd FlaskTest
-                        pip3 install -r requirements.txt
-                        nohup python3 app.py > output.log 2>&1 &
-                    EOF
-                    """
+                    sh 'scp -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/id_rsa -r * ubuntu@13.57.48.63:/home/ubuntu/app'
                 }
             }
         }
