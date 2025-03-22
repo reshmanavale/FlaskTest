@@ -48,29 +48,43 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
-          ssh -o StrictHostKeyChecking=no -i deploy_key.pem $STAGING_USER@$STAGING_HOST << 'EOF'
-            # Navigate to the correct Flask app directory
-            cd /home/ubuntu/flask-app
 
-            # Ensure the repository is correctly set up
+          ssh -o StrictHostKeyChecking=no -i deploy_key.pem $STAGING_USER@$STAGING_HOST << 'EOF'
+            set -e  # Exit on error
+            
+            # Ensure project directory exists
+            mkdir -p /home/ubuntu/FlaskTest
+            cd /home/ubuntu/FlaskTest
+
+            # Clone repo if it doesn't exist
             if [ ! -d ".git" ]; then
               git clone git@github.com:your-user/your-repo.git .
             fi
-            
-            # Ensure the correct branch is checked out
+
+            # Ensure correct branch
             git fetch origin
-            git checkout staging || git checkout -b staging
+            if git rev-parse --verify staging; then
+              git checkout staging
+            else
+              git checkout -b staging
+            fi
             git pull origin staging
 
-            # Ensure the virtual environment is set up
+            # Ensure virtual environment exists
             if [ ! -d "venv" ]; then
               python3 -m venv venv
             fi
-
             source venv/bin/activate
-            pip install -r requirements.txt
 
-            # Restart Flask application service
+            # Check if requirements.txt exists before installing dependencies
+            if [ -f "requirements.txt" ]; then
+              pip install -r requirements.txt
+            else
+              echo "ERROR: requirements.txt not found!"
+              exit 1
+            fi
+
+            # Restart Flask application
             if systemctl list-units --full -all | grep -Fq "flaskapp.service"; then
               sudo systemctl restart flaskapp
             else
