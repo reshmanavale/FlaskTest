@@ -49,17 +49,31 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
           ssh -o StrictHostKeyChecking=no -i deploy_key.pem $STAGING_USER@$STAGING_HOST << 'EOF'
-            cd /home/ubuntu/my-flask-app  # Change this to your correct app path
-            
+            # Navigate to the correct Flask app directory
+            cd /home/ubuntu/flask-app
+
+            # Ensure the repository is correctly set up
             if [ ! -d ".git" ]; then
-              git init
-              git remote add origin https://github.com/your-user/your-repo.git
-              git fetch
-              git checkout staging
+              git clone git@github.com:your-user/your-repo.git .
             fi
             
+            # Ensure the correct branch is checked out
+            git fetch origin
+            git checkout staging || git checkout -b staging
             git pull origin staging
+
+            # Ensure the virtual environment is set up
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+
             source venv/bin/activate
             pip install -r requirements.txt
-            sudo systemctl restart flaskapp
+
+            # Restart Flask application service
+            if systemctl list-units --full -all | grep -Fq "flaskapp.service"; then
+              sudo systemctl restart flaskapp
+            else
+              echo "Warning: flaskapp.service not found. Ensure it's set up."
+            fi
           EOF
