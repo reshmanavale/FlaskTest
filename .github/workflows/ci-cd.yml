@@ -44,38 +44,22 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           STAGING_HOST: ${{ secrets.STAGING_HOST }}
           STAGING_USER: ${{ secrets.STAGING_USER }}
+      
         run: |
           echo "$SSH_PRIVATE_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
           ssh -o StrictHostKeyChecking=no -i deploy_key.pem $STAGING_USER@$STAGING_HOST << 'EOF'
-            cd /path/to/app
+            cd /home/ubuntu/my-flask-app  # Change this to your correct app path
+            
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://github.com/your-user/your-repo.git
+              git fetch
+              git checkout staging
+            fi
+            
             git pull origin staging
             source venv/bin/activate
             pip install -r requirements.txt
-            systemctl restart flaskapp
-          EOF
-
-  deploy-production:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Deploy to Production Server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ secrets.PROD_HOST }}
-          PROD_USER: ${{ secrets.PROD_USER }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > deploy_key.pem
-          chmod 600 deploy_key.pem
-          ssh -o StrictHostKeyChecking=no -i deploy_key.pem $PROD_USER@$PROD_HOST << 'EOF'
-            cd /path/to/app
-            git pull origin main
-            source venv/bin/activate
-            pip install -r requirements.txt
-            systemctl restart flaskapp
+            sudo systemctl restart flaskapp
           EOF
