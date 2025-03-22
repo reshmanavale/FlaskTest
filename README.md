@@ -243,15 +243,20 @@ jobs:
 ## Screenshots and Attachments
 Attach the following screenshots for documentation:
 - **Jenkins Setup**: Screenshot of Jenkins plugins installed
-- **Jenkins Pipeline Execution**: Screenshot of a successful pipeline run
-- **GitHub Actions Execution**: Screenshot of a successful workflow run
+- ![Screenshot 2025-03-16 011436](https://github.com/user-attachments/assets/2fa15e5e-608e-40a3-b722-ebef25fe96bf)
+- ![Screenshot 2025-03-16 003144](https://github.com/user-attachments/assets/cc44f6d4-02bb-4fcf-b9ef-cd6657cc1905)
+![Screenshot 2025-03-16 003050](https://github.com/user-attachments/assets/b434eae5-3e07-44a9-a398-006aaa594db1)
+![Screenshot 2025-03-16 000732](https://github.com/user-attachments/assets/71edaf54-8f41-4539-8472-c6dc03da388d)
+
+
+- **GitHub Actions Execution**: 
+![Screenshot 2025-03-22 212616](https://github.com/user-attachments/assets/47ff9976-fb02-4892-acdb-5cab35d30e48)
+<img width="671" alt="image" src="https://github.com/user-attachments/assets/17d02bb3-342c-4e04-bc43-94b1d2ab5228" />
+
+
 - **AWS EC2 Deployment**: Screenshot of the deployed application running
+![Screenshot 2025-03-22 212616](https://github.com/user-attachments/assets/e45b23c6-4bba-48c7-a679-8c041601c01f)
 
-You can attach screenshots in the `docs/screenshots` folder inside your repository and reference them inside this README.
-
-Example Markdown Image Reference:
-```md
-![Jenkins Pipeline](docs/screenshots/jenkins_pipeline.png)
 ```
 
 ---
