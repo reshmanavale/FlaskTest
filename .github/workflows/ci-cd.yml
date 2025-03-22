@@ -32,7 +32,7 @@ jobs:
         run: python -m unittest discover
 
   deploy-staging:
-    if: github.ref == 'refs/heads/staging'
+    if: startsWith(github.ref, 'refs/heads/staging')
     needs: test
     runs-on: ubuntu-latest
 
